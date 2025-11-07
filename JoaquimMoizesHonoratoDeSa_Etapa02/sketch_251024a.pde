@@ -2,38 +2,27 @@
 // Projeto de Fundamentos de Computação Gráfica
 
 // --- Paleta de Cores ---
-color yellowWallE = #ffc800; // Amarelo principal
-color grayMedium = #8C8C8C;   // Corpo da máquina
-color grayLight = #DCDCDC;   // Destaques e olhos
-
-color grayKnob = #5A5A5A;    // Botões e rolos
-color blueLens = #0C2839;    // "Iris" do olho
-color redDetail = #D93030;   // Detalhe do medidor de carga
-color branco = #FFFFFF;
-color cinza = #6b6d6e; // Painel botões
-color cinza2 = #8F939D;
-color cinzaMao = #A2A6B2;
-color cinzaMedio = #4d4e50;
-color cinzaEscuro = #272827;
+color amarelo = #ffc800;        // Amarelo Wall-E
+color azulLente = #0C2839;      // "Iris" do olho
+color vermelho = #D93030;       // Circulo do "E" em wall-e 
+color cinza = #6b6d6e;          // Painel botões
+color cinza2 = #8F939D;         // Pescoço, Binóculos, Borda Olho, Braços e detalhes da maquina
+color cinzaMao = #A2A6B2;       // Cinza mais claro da mão
+color cinzaClaro = #DCDCDC;     // Teclas do teclado
+color cinzaMedio = #4d4e50;     // Esteiras, rolo da maquina, 
+color cinzaEscuro = #272827;    //
 
 
 void setup() {
-  size(800, 800); // Tela um pouco maior para os detalhes
+  size(800, 800);
 
-  // Define o modo de desenho de retângulos a partir do centro
-  // Isso torna o posicionamento simétrico MUITO mais fácil.
   rectMode(CENTER);
-  textAlign(CENTER, CENTER); // Alinha o texto pelo centro
+  textAlign(CENTER, CENTER);
 }
 
 void draw() {
-  background(235, 227, 209); // Fundo quase branco
-
-  // --- Desenha a partir do centro da tela ---
-  translate(width/2, height/2 + 50); // Move a origem (0,0) para o centro
-  strokeCap(ROUND); // Deixa as pontas das linhas arredondadas
-
-  translate(0, -80);
+  background(235, 227, 209); 
+  translate(width/2, height/2); // Move a origem (0,0) para o centro
 
   // Rolo da Máquina e Papel (Mais ao fundo)
   desenhaPapel();
@@ -41,11 +30,10 @@ void draw() {
   // Corpo Principal
   desenhaCorpo();
 
-  // Esteiras
   desenhaEsteira(-235, 285); // Esteira Esquerda
   desenhaEsteira(235, 285);  // Esteira Direita
 
-  // Braços / Alavancas
+  // Braços
   desenhaBracos();
 
   // Cabeça / Olhos
@@ -55,16 +43,11 @@ void draw() {
   desenhaTeclado();
 }
 
-// ==========================================================
-// FUNÇÕES DE DESENHO (para organizar o código)
-// ==========================================================
-
 void desenhaCorpo() {
-  pushMatrix(); // Salva a coordenada (centro)
-
+  pushMatrix(); 
   // Caixa principal
   noStroke();
-  fill(yellowWallE);
+  fill(amarelo);
   rect(0, 100, 320, 260); // (x, y, larg, alt, arredondamento)
 
   // Painel botões
@@ -76,90 +59,74 @@ void desenhaCorpo() {
   rect(0, -28, 330, 10, 5);
 
   // Logo "WALL-E"
-  stroke(redDetail);
+  stroke(vermelho);
   strokeWeight(0);
   fill(cinzaEscuro);
   textSize(40);
-  text("WALL", -15, 170);
-  fill(redDetail);
-  ellipse(70, 170, 40, 40);
-  fill(branco);
-  text("E", 70, 170);
+  text("WALL", -15, 140);
+  fill(vermelho);
+  ellipse(70, 140, 40, 40);
+  fill(255);
+  text("E", 70, 139);
   fill(cinzaEscuro);
-  ellipse(40, 170, 10, 10);
+  ellipse(40, 140, 10, 10);
 
   // Medidor de carga (LEDs)
   noStroke();
   fill(cinzaEscuro);
-  rect(50, 10, 40, 50, 5);
+  rect(30, 10, 50, 55, 0);
   fill(#F0E040); // Led 1
-  rect(50, -5, 20, 5, 2);
+  rect(30, -5, 25, 5, 2);
   fill(#d0c02a); // Led 2
-  rect(50, 5, 20, 5, 2);
+  rect(30, 5, 25, 5, 2);
   fill(#B0A020); // Led 3
-  rect(50, 15, 20, 5, 2);
-  fill(#908010); // Led 4 (fraco)
-  rect(50, 25, 20, 5, 2);
+  rect(30, 15, 25, 5, 2);
+  fill(#908010); // Led 4
+  rect(30, 25, 25, 5, 2);
 
   desenhaAltoFalante();
 
-  desenhaBotoesPainel();
-
-  popMatrix(); // Retorna ao centro
+  popMatrix(); 
 }
 
-
 void desenhaEsteira(float x, float y) {
-  pushMatrix(); // Salva a coordenada (centro)
-  translate(x, y); // Move para a posição da esteira
-
+  pushMatrix(); 
+  translate(x, y);
 
   fill(cinzaMedio);
   noStroke();
 
-  float denteWidth = 129;   // Mais largo que os 10 originais
-  float denteHeight = 35;  // Um pouco mais alto que 10
-  float cornerRadius = 4;  // Arredondamento dos cantos
-  int numDentes = 5;       // 7 dentes, como na foto
-
-  float yStart = -155; // Posição Y do primeiro dente
-  float yEnd = 0;   // Posição Y do último dente
+  int numDentes = 5; 
 
   for (int i = 0; i < numDentes; i++) {
-    // Mapeia o índice 'i' (de 0 a 6) para a posição Y (de -70 a 70)
-    // Isso distribui os 7 dentes perfeitamente
-    y = map(i, 0, numDentes - 1, yStart, yEnd);
-
-    // Lado esquerdo (centralizado em x = -55)
-    rect(0, y, denteWidth, denteHeight, cornerRadius);
+    y = map(i, 0, numDentes - 1, -155, 0);
+    rect(0, y, 129, 35, 4);
   }
 
-  popMatrix(); // Retorna ao centro
+  popMatrix(); 
 }
 
 
 void desenhaCabeca() {
-  pushMatrix(); // Salva a coordenada (centro)
+  pushMatrix();
 
   // Pescoço
   fill(cinza2);
-  rect(0, -105, 25, 70, 0); // Base do pescoço
-  //rect(0, -90, 35, 35, 0); // Base do pescoço
-  rect(0, -45, 40, 25, 0); // Base do pescoço
-  rect(0, -60, 25, 10, 0); // Base do pescoço
+  rect(0, -116, 25, 95, 0); 
+  rect(0, -45, 40, 25, 0); 
+  rect(0, -60, 25, 10, 0); 
 
-
-  // --- Olhos (Binóculos) ---
-  // A função desenha os dois olhos
+  // Olhos (Binóculos)
   strokeWeight(4);
-  stroke(yellowWallE);
+  stroke(amarelo);
   fill(cinza2);
-  rect(-65, -150, 120, 95, 40, 0, 40, 25); // Caixa principal
-  rect(65, -150, 123, 95, 0, 40, 25, 40); // Caixa principal
+  rect(-75, -150, 135, 100, 40, 0, 40, 25); // Binóculos esquerda
+  rect(75, -150, 135, 100, 0, 40, 25, 40); // Binóculos direita
+  
   DesenhaOlho(-60, -150, true); // Olho Esquerdo
   DesenhaOlho(60, -150, false); // Olho Direito
 
-  popMatrix(); // Retorna ao centro
+  popMatrix();
 }
 
 
@@ -171,13 +138,13 @@ void DesenhaOlho(float x, float y, boolean antena) {
   strokeWeight(5);
   stroke(cinza2);
   if (antena) {
-    //Antena direita
-    bezier(-119, -257, -111, -276, -122, -268, -28, -292);
-    ellipse(-119, -257, 10, 10);
+    //Antena esquerda
+    bezier(-95, -40, -86, -71, -85, -65, 0, -81);
+    ellipse(-95, -40, 10, 10);
   } else {
     // Antena direita
-    bezier(119, -257, 111, -276, 122, -268, 28, -292);
-    ellipse(119, -257, 10, 10);
+    bezier(95, -40, 86, -71, 85, -65, 0, -81);
+    ellipse(95, -40, 10, 10);
   }
 
   // Lente (Aro)
@@ -187,7 +154,7 @@ void DesenhaOlho(float x, float y, boolean antena) {
   ellipse(0, 0, 70, 70); // Aro preto
 
   // Lente (Íris)
-  fill(blueLens);
+  fill(azulLente);
   ellipse(0, 0, 60, 60);
 
   // Reflexo da luz
@@ -203,110 +170,134 @@ void DesenhaOlho(float x, float y, boolean antena) {
 void desenhaPapel() {
   pushMatrix();
 
-  //--- Papel ---
+  // Papel
   stroke(cinzaEscuro);
   strokeWeight(2);
   fill(255);
-  rect(0, -196, 245, 200, 5); // O papel
+  rect(0, -196, 245, 200, 5); 
 
   // Detalhe Maquina Direita
   noStroke();
   fill(cinzaMedio);
-  rect(130, -49, 25, 35);
-  rect(145, -48, 10, 15);
+  rect(130, -52, 25, 40);
+  rect(145, -52, 10, 15);
 
   fill(cinza2);
-  rect(155, -50, 15, 50);
-  rect(150, -70, 15, 10);
-  rect(165, -50, 9, 25);
+  rect(155, -56, 12, 50);
+  rect(152, -77, 15, 10);
+  rect(165, -53, 20, 25);
 
   fill(cinzaMedio);
-  rect(178, -50, 20, 40, 5);
+  rect(187, -52, 25, 50, 5);
 
   // Detalhe Maquina Esquerda
   fill(cinzaMedio);
-  rect(-130, -49, -25, 35);
-  rect(-145, -48, -10, 15);
+  rect(-130, -52, 25, 40);
+  rect(-145, -52, -10, 15);
 
   fill(cinza2);
-  rect(-155, -50, -15, 50);
-  rect(-150, -70, -15, 10);
-  rect(-172, -50, 20, 26);
+  rect(-155, -56, -12, 50);
+  rect(-152, -77, -15, 10);
+  rect(-170, -56, 20, 30);
 
-  rect(-172, -63, 18, 0, 0, 0, 0, -30);
+  rect(-170, -69, 18, 0, 0, 0, 0, -35);
+  rect(-187, -65, 35, 12, 0, 0, 0, 0);
+  rect(-215, -70, 35, 35, 5);
 
-  rect(-190, -58, 20, 10, 0, 0, 0, 0);
-
-  rect(-214, -60, 35, 35, 5);
-
-  // --- Rolo (Platen) ---
+  // --- Rolo da maquina
   strokeWeight(4);
   stroke(cinzaEscuro);
-  fill(grayKnob);
-  rect(0, -110, 308, 47, 10); // Rolo central
+  fill(cinzaMedio);
+  rect(0, -110, 308, 47, 10);
 
   popMatrix();
 }
-
 
 void desenhaTeclado() {
   pushMatrix();
-  translate(0, 260); // posição do teclado em relação ao corpo
+  translate(0, 260); 
   noStroke();
 
-  // --- BASE TRAPEZOIDAL ---
-  fill(cinzaMao);
+  // --- Setup do Arredondamento ---
+  float raio = 20.0;
+  float x_base = 190.0 - raio; // = 170.0
+  float y_base = 42.0;
+  float x_lateral = 185.8; 
+  float y_lateral = 22.4; 
+
+  fill(cinza);
   beginShape();
-  vertex(-190, 42);
-  vertex(190, 42);
-  vertex(160, -67);
-  vertex(-160, -67);
-  endShape(CLOSE);
+  // 1. Topo (começando do lado esquerdo)
+  vertex(-140, -75); 
+  vertex(-140, -95); 
+  vertex(-165, -95); 
+  vertex(-165, -75); // Ponto superior da lateral esquerda
+  // 2. Canto Inferior Esquerdo (Arredondado)
+  vertex(-x_lateral, y_lateral); // Ponto de início da curva (na lateral)
+  quadraticVertex(-190, 42, -x_base, y_base); // Curva até a base
+  // 3. Linha de Baixo (Reta)
+  vertex(x_base, y_base); 
+  // 4. Canto Inferior Direito (Arredondado)
+  quadraticVertex(190, 42, x_lateral, y_lateral); // Curva até a lateral
+  // 5. Lado Direito (subindo)
+  vertex(165, -75); // Ponto superior da lateral direita
+  vertex(165, -95); 
+  vertex(140, -95); 
+  vertex(140, -75); // Ponto superior interno
+  endShape(CLOSE); // Fecha o topo
   
+  // --- Parte interna (COM CANTOS ARREDONDADOS) ---
   fill(cinzaEscuro);
+  
+  // --- Setup do Arredondamento Interno ---
+  float raio_interno = 10.0; // Raio dos cantos internos. Ajuste se precisar.
+  // Ponto na linha de base (horizontal)
+  float x_base_int = 165.0 - raio_interno; // = 155.0
+  float y_base_int = 23.0;
+  // Ponto na linha lateral (inclinada)
+  // (Calculado para seguir a inclinação interna)
+  float x_lat_int = 163.0; 
+  float y_lat_int = 13.2; 
+  // --- Fim do Setup Interno ---
+  
   beginShape();
-  vertex(-162, 23);
-  vertex(162, 23);
-  vertex(140, -60);
-  vertex(-140, -60);
+  // 1. Topo (reto)
+  vertex(-145, -75); 
+  vertex(145, -75); 
+  // 2. Canto Inferior Direito (Arredondado)
+  vertex(x_lat_int, y_lat_int); // Ponto de início da curva (na lateral)
+  quadraticVertex(165, 23, x_base_int, y_base_int); // Curva até a base
+  // 3. Linha de Baixo (Reta)
+  vertex(-x_base_int, y_base_int);
+  // 4. Canto Inferior Esquerdo (Arredondado)
+  quadraticVertex(-165, 23, -x_lat_int, y_lat_int); // Curva até a lateral
+  // 5. Fechamento
   endShape(CLOSE);
   
-  strokeWeight(2);
-  stroke(#3a3a28); 
-  fill(grayLight);
+  // Botões
+  noStroke(); 
+  fill(cinzaClaro);
   ellipse(-86, 5, 42, 23);
-  fill(grayLight);  
+  fill(cinzaClaro); 
   ellipse(0, 5, 42, 23);
-  fill(grayLight);  
+  fill(cinzaClaro); 
   ellipse(86, 5, 42, 23);
   textSize(15);
   fill(0);
-  text("ON", -87,6);
-  text("DIG", 0,6);
-  text("TEXT", 87,6);
+  textAlign(CENTER, CENTER); // Centraliza o texto
+  text("ON", -86, 5);
+  text("DIG", 0, 5);
+  text("TEXT", 87, 5);
   
-  
-  
-
-  // --- SOMBRA INFERIOR ---
   noStroke();
   fill(0, 30);
-  beginShape();
-  vertex(-170, 40);
-  vertex(170, 40);
-  vertex(180, 50);
-  vertex(-180, 50);
-  endShape(CLOSE);
-
-
+  rect(0, 45, 344, 8, 20); 
+  
   popMatrix();
 }
 
-
-
 void desenhaBracos() {
   pushMatrix();
-
   // Braço direito
   fill(cinza2);
   rect(195, 30, 30, 50);
@@ -328,104 +319,27 @@ void desenhaBracos() {
   quad(-80, -5, -80, 28, -115, 28, -115, -18);
   quad(-80, 65, -80, 33, -115, 33, -115, 78);
 
-
-
   popMatrix();
 }
 
-// ==========================================================
-// FUNÇÃO PARA O PAINEL DE BOTÕES
-// ==========================================================
-void desenhaBotoesPainel() {
-  pushMatrix(); // Salva o estado atual (para não afetar outros desenhos)
 
-  // O painel cinza está centrado em (0, 2)
-  // Vamos desenhar os botões com base nesse centro.
-  float y_botoes = 25; // Posição Y (vertical) central
-  float diametro = 22; // Diâmetro de cada botão
-
-  // --- Botão 1 (Esquerda) ---
-  strokeWeight(2);
-  stroke(#3A3A3A); // Contorno escuro
-  fill(grayKnob);  // Fundo do botão
-  ellipse(10, y_botoes, diametro, diametro);
-  // "Luz" do botão
-  noStroke();
-  fill(#D93030); // Vermelho (igual ao seu 'redDetail')
-  ellipse(10, y_botoes, diametro * 0.5, diametro * 0.5);
-  // "Brilho"
-  fill(255, 100); // Branco com transparência
-  ellipse(10, y_botoes - 2, 4, 4);
-
-  // --- Botão 2 (Meio) ---
-  strokeWeight(2);
-  stroke(#3A3A3A);
-  fill(grayKnob);
-  ellipse(-20, y_botoes, diametro, diametro);
-  // "Luz" do botão
-  noStroke();
-  fill(#F0E040); // Amarelo (igual ao seu 'Led 1')
-  ellipse(-20, y_botoes, diametro * 0.5, diametro * 0.5);
-  // "Brilho"
-  fill(255, 100);
-  ellipse(-20, y_botoes - 2, 4, 4);
-
-  // --- Botão 3 (Direita) ---
-  strokeWeight(2);
-  stroke(#3A3A3A);
-  fill(grayKnob);
-  ellipse(-50, y_botoes, diametro, diametro);
-  // "Luz" do botão
-  noStroke();
-  fill(#40A0F0); // Um azul
-  ellipse(-50, y_botoes, diametro * 0.5, diametro * 0.5);
-  // "Brilho"
-  fill(255, 100);
-  ellipse(-52, y_botoes - 2, 4, 4);
-
-  popMatrix(); // Restaura o estado anterior
-}
-
-// ==========================================================
-// FUNÇÃO PARA O ALTO-FALANTE (VERSÃO GRADE)
-// ==========================================================
 void desenhaAltoFalante() {
   pushMatrix();
+  translate(-5, 105);
 
-  // Vamos centralizar o alto-falante no corpo principal,
-  // que está centralizado em (0, 100)
-  translate(0, 100);
-
-  // --- Configurações da Grade ---
   int numColunas = 2;
-  int numLinhas = 3;
-
-  float rWidth = 20;  // Largura de cada "furo"
-  float rHeight = 4; // Altura de cada "furo"
-  float xEspaco = 4; // Espaçamento horizontal
-  float yEspaco = 4; // Espaçamento vertical
-  float cornerRadius = 5; // Arredondamento
-
-
-  // --- Calcula a Posição Inicial (canto superior esquerdo) ---
-  // Lembre-se que (0,0) agora é o CENTRO da grade
-  // Então o X inicial é -(metade da largura total) + (metade da largura do 1º rect)
-  float xStart = -48;
-  float yStart = -112;
+  int numLinhas = 4;
 
   noStroke();
-  fill(cinzaEscuro); // Cor dos "furos"
+  fill(cinzaEscuro);
 
-  // --- Loop Duplo para desenhar a grade ---
-  for (int i = 0; i < numColunas; i++) { // i = 0, 1
-    for (int j = 0; j < numLinhas; j++) { // j = 0, 1, 2, 3
+  for (int i = 0; i < numColunas; i++) { 
+    for (int j = 0; j < numLinhas; j++) { 
+      
+      float x = -48 + i * (20 + 4);
+      float y = -112 + j * (3 + 3);
 
-      // Calcula a posição X e Y para este retângulo
-      float x = xStart + i * (rWidth + xEspaco);
-      float y = yStart + j * (rHeight + yEspaco);
-
-      // Desenha o retângulo arredondado
-      rect(x, y, rWidth, rHeight, cornerRadius);
+      rect(x, y, 20, 3, 10);
     }
   }
 
