@@ -195,21 +195,33 @@ void desenhaOlho(float x, float y, boolean antena) {
     ellipse(95, -40, 10, 10);
   }
 
+  // --- LÓGICA PARA SEGUIR O MOUSE ---
+  // (Exatamente a mesma lógica de antes)
+  float angle = atan2(mouseY - y, mouseX - x); 
+  float maxMove = 15.0; // O quanto o olho se move
+  float irisX = cos(angle) * maxMove; 
+  float irisY = sin(angle) * maxMove;
+  // --- FIM DA LÓGICA ---
+
+
   // Lente (Aro)
   stroke(117, 117, 117);
   strokeWeight(0);
   fill(117, 117, 117);
-  ellipse(0, 0, 70, 70); // Aro preto
+  // Agora o ARO também usa irisX e irisY
+  ellipse(irisX, irisY, 70, 70); // MODIFICADO
 
   // Lente (Íris)
   fill(azulLente);
-  ellipse(0, 0, 60, 60);
+  // A ÍRIS também usa irisX e irisY
+  ellipse(irisX, irisY, 60, 60); // MODIFICADO
 
   // Reflexo da luz
   fill(40, 100, 135);
   noStroke();
-  ellipse(-15, -10, 18, 18);
-  ellipse(-25, -2, 6, 6);
+  // Os REFLEXOS também são somados a irisX e irisY
+  ellipse(irisX - 15, irisY - 10, 18, 18); // MODIFICADO
+  ellipse(irisX - 25, irisY - 2, 6, 6);   // MODIFICADO
 
   popMatrix();
 }
