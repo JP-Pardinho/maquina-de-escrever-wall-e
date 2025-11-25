@@ -23,6 +23,8 @@ boolean botaoTextLigado = false;
 String textoNoPapel = "";
 final int CARACTERES_POR_LINHA = 30;
 final int NUMERO_DE_LINHAS_MAXIMO = 10;
+String[] linha1 = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
+String[] linha2 = {"F", "G", "H", "J", "K", "C", "V", "B", "N", "M"};
 
 void setup() {
   size(800, 800);
@@ -470,78 +472,139 @@ void desenhaBotoes() {
 }
 
 void desenhaLinhaTeclas(String[] teclas, float y, float x_inicio, float x_fim, float diametro) {
-
   int numTeclas = teclas.length;
   
+  
+  float absBaseX = width/2;
+  float absBaseY = height/2 + 260;
+
   for (int i = 0; i < numTeclas; i++) {
     float x = map(i, 0, numTeclas - 1, x_inicio, x_fim);
+    
+    
+    boolean tecladoPressionado = keyPressed && (Character.toUpperCase(key) == teclas[i].charAt(0));
+    
+    
+    float absX = absBaseX + x;
+    float absY = absBaseY + y;
+    boolean mouseClicado = mousePressed && (dist(mouseX, mouseY, absX, absY) < diametro/2);
 
-   noStroke(); 
+    noStroke(); 
 
-    // --- NOVA LÓGICA DE MUDANÇA DE COR ---
-    // Verifica se a tecla está sendo pressionada
-    if (keyPressed && Character.toUpperCase(key) == teclas[i].charAt(0)) {
-      fill(amarelo); // Mude para 'vermelho' ou 'color(200)' se preferir outra cor
+    
+    if (tecladoPressionado || mouseClicado) {
+      fill(amarelo); 
     } else {
-      fill(cinzaClaro); // Cor normal da tecla
+      fill(cinzaClaro);
     }
-    // -------------------------------------
 
-    // Desenha o botão (elipse) com a cor definida acima
     ellipse(x, y, diametro, diametro);
 
-    // Desenha a letra (sempre preta)
     fill(0);
     text(teclas[i], x, y);
   }
 }
 
 void keyPressed() {
-
   if (key == 'o' || key == 'O') {
-    botaoOnLigado = !botaoOnLigado;
-    if (somTecla != null) {
-      somTecla.rewind();
-      somTecla.play();
-    }
-    
-    if(!botaoOnLigado) textoNoPapel = "";
+    alternarPower(); 
   }
-
   if (key == 'd' || key == 'D') {
-    botaoDigLigado = !botaoDigLigado;
-    if(botaoDigLigado){
-      botaoTextLigado = false;
-    }
+    alternarDig();
   }
-
   if (key == 't' || key == 'T') {
-    botaoTextLigado = !botaoTextLigado;
-    if(botaoTextLigado){
-      botaoDigLigado = false;
-    }
+    alternarText();
   }
   
-  if (botaoOnLigado) {
+  processarEntrada(key); 
+}
+
+
+void alternarPower() {
+    botaoOnLigado = !botaoOnLigado;
+    if (somTecla != null) { somTecla.rewind(); somTecla.play(); }
+    if (!botaoOnLigado) textoNoPapel = "";
+}
+void alternarDig() {
+    botaoDigLigado = !botaoDigLigado;
+    if(botaoDigLigado) botaoTextLigado = false;
+}
+void alternarText() {
+    botaoTextLigado = !botaoTextLigado;
+    if(botaoTextLigado) botaoDigLigado = false;
+}
+
+void verificarCliqueNoTeclado(String[] teclas, float yLocal, float xInicio, float xFim, float diametro, float offX, float offY) {
+  int numTeclas = teclas.length;
+  for (int i = 0; i < numTeclas; i++) {
+    float xLocal = map(i, 0, numTeclas - 1, xInicio, xFim);
     
-    if (key == BACKSPACE) {
+
+    float absX = offX + xLocal;
+    float absY = offY + yLocal;
+    
+
+    if (dist(mouseX, mouseY, absX, absY) < diametro/2) {
+      processarEntrada(teclas[i].charAt(0));
+    }
+  }
+}
+
+void mousePressed() {
+
+  float baseX = width/2;
+  float baseY = height/2 + 260; 
+
+
+  if (dist(mouseX, mouseY, baseX - 86, baseY + 8) < 21) {
+    alternarPower();
+  }
+
+  if (dist(mouseX, mouseY, baseX, baseY + 8) < 21) {
+    alternarDig();
+  }
+
+  if (dist(mouseX, mouseY, baseX + 86, baseY + 8) < 21) {
+    alternarText();
+  }
+
+
+  if (botaoOnLigado) {
+
+    if (botaoDigLigado) {
+       verificarCliqueNoTeclado(linha1, -50, -135, 135, 25, baseX, baseY);
+    }
+
+    if (botaoTextLigado) {
+       verificarCliqueNoTeclado(linha2, -20, -135, 135, 25, baseX, baseY);
+    }
+  }
+}
+
+void processarEntrada(char k) {
+  if (botaoOnLigado) {
+    String letrasPermitidas = "fghjkcvbnmFGHJKCVBNM";
+    String numerosPermitidos = "0123456789";
+    
+
+    k = Character.toUpperCase(k);
+
+    if (k == BACKSPACE) {
       if (textoNoPapel.length() > 0) {
         textoNoPapel = textoNoPapel.substring(0, textoNoPapel.length() - 1);
       }
     } 
     else {
-      String letrasPermitidas = "fghjkcvbnmFGHJKCVBNM"; 
-      String numerosPermitidos = "0123456789";         
-      
-      if (botaoTextLigado && letrasPermitidas.indexOf(key) != -1) {
-    
+
+      if (botaoTextLigado && letrasPermitidas.indexOf(k) != -1) {
          if (textoNoPapel.length() < CARACTERES_POR_LINHA * NUMERO_DE_LINHAS_MAXIMO) {
-             textoNoPapel += String.valueOf(key).toUpperCase(); 
+             textoNoPapel += k;
          }
       }
-      else if (botaoDigLigado && numerosPermitidos.indexOf(key) != -1) {
+
+      else if (botaoDigLigado && numerosPermitidos.indexOf(k) != -1) {
          if (textoNoPapel.length() < CARACTERES_POR_LINHA * NUMERO_DE_LINHAS_MAXIMO) {
-             textoNoPapel += key;
+             textoNoPapel += k;
          }
       }
     }
